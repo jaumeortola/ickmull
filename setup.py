@@ -16,12 +16,18 @@ setup(name='ickmull',
       url='http://thinkubator.ccsp.sfu.ca/wikis/xmlProduction/Home',
       license='GPL',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
+      package_data = { 'ickmull.externals': ['idml_schema/*.rng',
+                                             'jing/*.*',
+                                            ],
+                     },
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           # -*- Extra requirements: -*-
           'lxml >= 2.2'
       ],
+      # Tests require:
+      #   * Java
       entry_points="""
       # -*- Entry points: -*-
       """,

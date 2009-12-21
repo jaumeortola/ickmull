@@ -6,4 +6,6 @@ ickmull.egg-info/SOURCES.txt
 ickmull.egg-info/dependency_links.txt
 ickmull.egg-info/entry_points.txt
 ickmull.egg-info/not-zip-safe
+ickmull.egg-info/requires.txt
 ickmull.egg-info/top_level.txt
+ickmull/externals/__init__.py
