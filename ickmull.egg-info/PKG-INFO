@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: ickmull
+Version: 0.1dev
+Summary: Ickmull provides tools and testing for the transformation of XHTML into ICML using XSLT.
+Home-page: Canadian Centre for Studies in Publishing
+Author: Keith Fahlgren
+Author-email: abdelazer+ickmull@gmail.com
+License: GPL
+Description: Ickmull is a development of  Canadian Centre for Studies in Publishing
+Keywords: icml xslt indesign
+Platform: UNKNOWN
