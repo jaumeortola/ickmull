@@ -31,7 +31,6 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
                 omit-result-prefixes="xhtml"
                 version="1.0">
 
-  <xsl:param name="output"/>
   <xsl:param name="table-width">540</xsl:param>
 
   <!-- Fixed strings used to indicate ICML and software version -->
