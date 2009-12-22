@@ -99,55 +99,16 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       <xsl:with-param name="content" select="concat('by ', .)"/>
     </xsl:call-template>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class='figure_table']">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/figure_table">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
-  <xsl:template match="xhtml:p[@class='index']">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/index">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
-  <xsl:template match="xhtml:p[@class='index_sub']">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/index_sub">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
-  <xsl:template match="xhtml:p[@class='excerpt']">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/excerpt">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
-  <xsl:template match="xhtml:p[@class='quote_ind']">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/quote_ind">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
+  <xsl:template match="xhtml:p[@class='excerpt' or
+                               @class='figure_table' or
+                               @class='index' or
+                               @class='index_sub' or
+                               @class='quote_ind' or
+                               @class='reference']">
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name" select="@class"/>
+      <xsl:with-param name="content" select="."/>
+    </xsl:call-template>
   </xsl:template>
   <xsl:template match="xhtml:p[@class='quote']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/quote">
@@ -218,16 +179,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       <Br/>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class='reference']">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/reference">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
+
   <xsl:template match="xhtml:div[@class='footnotes']/xhtml:p">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
       <CharacterStyleRange>
@@ -238,6 +190,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
+
   <xsl:template match="xhtml:p">
     <xsl:choose>
       <xsl:when test="preceding-sibling::*[1][self::xhtml:p]">
@@ -565,11 +518,13 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </ParagraphStyleRange>
     </xsl:for-each>
   </xsl:template>
+
   <xsl:template match="xhtml:br">
     <xsl:text>
 </xsl:text>
     <xsl:apply-templates/>
   </xsl:template>
+
   <xsl:template match="xhtml:span[@class='table_figure']">
     <ParagraphStyleRange>
       <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
@@ -628,11 +583,13 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
+
   <xsl:template match="xhtml:tr">
     <xsl:if test="position() &gt; 2">
       <Br/>
     </xsl:if>
   </xsl:template>
+
   <xsl:template match="xhtml:td">
     <xsl:if test="position() &gt; 2">
       <Br/>
