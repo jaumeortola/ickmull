@@ -7,6 +7,7 @@ Created by Keith Fahlgren on Mon Dec 21 15:08:24 PST 2009
 Copyright (c) 2009 John W Maxwell. All rights reserved.
 """
 
+import difflib
 import glob
 import logging
 import os.path
@@ -48,7 +49,14 @@ class TestXHTML(object):
             log.debug('\nSmoke testing ICML similarity of %s' % xhtml_docname)
             xhtml = etree.parse(xhtml_fn)
             icml = ickmull.xhtml.as_icml(xhtml)
-            assert_equal(etree.tostring(expected_icml), etree.tostring(icml))
+            try:
+                assert_equal(etree.tostring(expected_icml), etree.tostring(icml))
+            except AssertionError:
+                # This is an absurd oneliner to keep the nose detailed-errors
+                # output small
+                diff = '\n'.join(list(difflib.unified_diff(etree.tostring(expected_icml, pretty_print=True).splitlines(),
+                                                           etree.tostring(icml, pretty_print=True).splitlines())))
+                raise AssertionError('XML documents did not match. Diff:\n%s' % diff)
 
     def test_xhtml_icml_output_valid_smoke(self):
         """All XHTML documents collected for smoketesting should be able to be transformed into an ICML document that passes validation."""
