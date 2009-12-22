@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- 
-v. 0.3, Dec 2009
+v. 0.4, Dec 2009
 
 This script is copyright 2009 by John W. Maxwell, Meghan MacDonald, 
 and Travis Nicholson at Simon Fraser University's Master of Publishing
@@ -84,26 +84,22 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </Story>
     </Document>
   </xsl:template>
+
   <xsl:template match="xhtml:h1|xhtml:h2|xhtml:h3|xhtml:h4|xhtml:h5|xhtml:h6">
-    <ParagraphStyleRange>
-      <xsl:attribute name="AppliedParagraphStyle">ParagraphStyle/<xsl:value-of select="name()"/></xsl:attribute>
-      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name" select="name()"/>
+      <xsl:with-param name="content" select="."/>
+    </xsl:call-template>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;dc-creator&quot;]">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/author">
-      <CharacterStyleRange>
-        <Content>by <xsl:value-of select="."/></Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
+
+
+  <xsl:template match="xhtml:p[@class='dc-creator']">
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">author</xsl:with-param>
+      <xsl:with-param name="content" select="concat('by ', .)"/>
+    </xsl:call-template>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;figure_table&quot;]">
+  <xsl:template match="xhtml:p[@class='figure_table']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/figure_table">
       <CharacterStyleRange>
         <Content>
@@ -113,7 +109,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;index&quot;]">
+  <xsl:template match="xhtml:p[@class='index']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/index">
       <CharacterStyleRange>
         <Content>
@@ -123,7 +119,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;index_sub&quot;]">
+  <xsl:template match="xhtml:p[@class='index_sub']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/index_sub">
       <CharacterStyleRange>
         <Content>
@@ -133,7 +129,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;excerpt&quot;]">
+  <xsl:template match="xhtml:p[@class='excerpt']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/excerpt">
       <CharacterStyleRange>
         <Content>
@@ -143,7 +139,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;quote_ind&quot;]">
+  <xsl:template match="xhtml:p[@class='quote_ind']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/quote_ind">
       <CharacterStyleRange>
         <Content>
@@ -153,11 +149,11 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;quote&quot;]">
+  <xsl:template match="xhtml:p[@class='quote']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/quote">
       <xsl:for-each select="*|text()">
         <xsl:choose>
-          <xsl:when test="self::xhtml:span[@class=&quot;table_figure&quot;]">
+          <xsl:when test="self::xhtml:span[@class='table_figure']">
             <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
               <Content>
                 <xsl:value-of select="normalize-space(.)"/>
@@ -177,7 +173,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
               </Content>
             </CharacterStyleRange>
           </xsl:when>
-          <xsl:when test="self::xhtml:span[@class=&quot;italic_sc&quot;]">
+          <xsl:when test="self::xhtml:span[@class='italic_sc']">
             <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic_sc">
               <Content>
                 <xsl:value-of select="normalize-space(.)"/>
@@ -187,7 +183,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
               </Content>
             </CharacterStyleRange>
           </xsl:when>
-          <xsl:when test="self::xhtml:span[@class=&quot;sc&quot;]">
+          <xsl:when test="self::xhtml:span[@class='sc']">
             <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/sc">
               <Content>
                 <xsl:value-of select="normalize-space(.)"/>
@@ -222,7 +218,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       <Br/>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class=&quot;reference&quot;]">
+  <xsl:template match="xhtml:p[@class='reference']">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/reference">
       <CharacterStyleRange>
         <Content>
@@ -232,7 +228,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:div[@class=&quot;footnotes&quot;]/xhtml:p">
+  <xsl:template match="xhtml:div[@class='footnotes']/xhtml:p">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
       <CharacterStyleRange>
         <Content>
@@ -248,7 +244,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
         <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
           <xsl:for-each select="*|text()">
             <xsl:choose>
-              <xsl:when test="self::xhtml:a[@class=&quot;footnote-reference&quot;]">
+              <xsl:when test="self::xhtml:a[@class='footnote-reference']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
                   <Content>
                     <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
@@ -258,7 +254,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
                   </Content>
                 </CharacterStyleRange>
               </xsl:when>
-              <xsl:when test="self::xhtml:span[@class=&quot;table_figure&quot;]">
+              <xsl:when test="self::xhtml:span[@class='table_figure']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
                   <Content>
                     <xsl:value-of select="normalize-space(.)"/>
@@ -295,7 +291,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
                   </Content>
                 </CharacterStyleRange>
               </xsl:when>
-              <xsl:when test="self::xhtml:span[@class=&quot;italic_sc&quot;]">
+              <xsl:when test="self::xhtml:span[@class='italic_sc']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic_sc">
                   <Content>
                     <xsl:value-of select="normalize-space(.)"/>
@@ -305,7 +301,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
                   </Content>
                 </CharacterStyleRange>
               </xsl:when>
-              <xsl:when test="self::xhtml:span[@class=&quot;sc&quot;]">
+              <xsl:when test="self::xhtml:span[@class='sc']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/sc">
                   <Content>
                     <xsl:value-of select="normalize-space(.)"/>
@@ -354,7 +350,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
         <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
           <xsl:for-each select="*|text()">
             <xsl:choose>
-              <xsl:when test="self::xhtml:a[@class=&quot;footnote-reference&quot;]">
+              <xsl:when test="self::xhtml:a[@class='footnote-reference']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
                   <Content>
                     <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
@@ -364,7 +360,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
                   </Content>
                 </CharacterStyleRange>
               </xsl:when>
-              <xsl:when test="self::xhtml:span[@class=&quot;table_figure&quot;]">
+              <xsl:when test="self::xhtml:span[@class='table_figure']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
                   <Content>
                     <xsl:value-of select="normalize-space(.)"/>
@@ -401,7 +397,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
                   </Content>
                 </CharacterStyleRange>
               </xsl:when>
-              <xsl:when test="self::xhtml:span[@class=&quot;italic_sc&quot;]">
+              <xsl:when test="self::xhtml:span[@class='italic_sc']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic_sc">
                   <Content>
                     <xsl:value-of select="normalize-space(.)"/>
@@ -411,7 +407,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
                   </Content>
                 </CharacterStyleRange>
               </xsl:when>
-              <xsl:when test="self::xhtml:span[@class=&quot;sc&quot;]">
+              <xsl:when test="self::xhtml:span[@class='sc']">
                 <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/sc">
                   <Content>
                     <xsl:value-of select="normalize-space(.)"/>
@@ -458,11 +454,11 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  <xsl:template match="xhtml:table[@class=&quot;docutils footnote&quot;]/xhtml:tbody/xhtml:tr">
+  <xsl:template match="xhtml:table[@class='docutils footnote']/xhtml:tbody/xhtml:tr">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
       <xsl:for-each select="xhtml:td">
         <xsl:choose>
-          <xsl:when test="self::xhtml:td[@class=&quot;label&quot;]">
+          <xsl:when test="self::xhtml:td[@class='label']">
             <CharacterStyleRange>
               <Content><xsl:value-of select="substring-before(substring-after(.,'['),']')"/>. </Content>
             </CharacterStyleRange>
@@ -482,7 +478,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/quote">
         <xsl:for-each select="*|text()">
           <xsl:choose>
-            <xsl:when test="self::xhtml:a[@class=&quot;footnote-reference&quot;]">
+            <xsl:when test="self::xhtml:a[@class='footnote-reference']">
               <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
                 <Content>
                   <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
@@ -574,7 +570,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
 </xsl:text>
     <xsl:apply-templates/>
   </xsl:template>
-  <xsl:template match="xhtml:span[@class=&quot;table_figure&quot;]">
+  <xsl:template match="xhtml:span[@class='table_figure']">
     <ParagraphStyleRange>
       <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
         <Content>
@@ -583,7 +579,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </CharacterStyleRange>
     </ParagraphStyleRange>
   </xsl:template>
-  <xsl:template match="xhtml:table[@class=&quot;docutils&quot;]/xhtml:tbody">
+  <xsl:template match="xhtml:table[@class='docutils']/xhtml:tbody">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/table">
       <CharacterStyleRange>
         <Br/>
@@ -646,5 +642,22 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
     <ParagraphStyleRange>foo
             <CharacterStyleRange><xsl:variable name="halfwidth" select="@width div 2"/><xsl:variable name="halfheight" select="@height div 2"/><Rectangle Self="uec" ItemTransform="1 0 0 1 {$halfwidth} -{$halfheight}"><Properties><PathGeometry><GeometryPathType PathOpen="false"><PathPointArray><PathPointType Anchor="-{$halfwidth} -{$halfheight}" LeftDirection="-{$halfwidth} -{$halfheight}" RightDirection="-{$halfwidth} -{$halfheight}"/><PathPointType Anchor="-{$halfwidth} {$halfheight}" LeftDirection="-{$halfwidth} {$halfheight}" RightDirection="-{$halfwidth} {$halfheight}"/><PathPointType Anchor="{$halfwidth} {$halfheight}" LeftDirection="{$halfwidth} {$halfheight}" RightDirection="{$halfwidth} {$halfheight}"/><PathPointType Anchor="{$halfwidth} -{$halfheight}" LeftDirection="{$halfwidth} -{$halfheight}" RightDirection="{$halfwidth} -{$halfheight}"/></PathPointArray></GeometryPathType></PathGeometry></Properties><Image Self="ue6" ItemTransform="1 0 0 1 -{$halfwidth} -{$halfheight}"><Properties><Profile type="string">$ID/Embedded</Profile><GraphicBounds Left="0" Top="0" Right="{@width}" Bottom="{@height}"/></Properties><Link Self="ueb" LinkResourceURI="file:///{@src}"/></Image></Rectangle><Br/></CharacterStyleRange>
         </ParagraphStyleRange>
+  </xsl:template>
+
+  <!-- ==================================================================== -->
+  <!-- Named templates -->
+  <!-- ==================================================================== -->
+  <xsl:template name="para-style-range">
+    <xsl:param name="style-name"/> 
+    <xsl:param name="content" select="."/>
+    <ParagraphStyleRange>
+      <xsl:attribute name="AppliedParagraphStyle">
+        <xsl:value-of select="concat('ParagraphStyle/', $style-name)"/>
+      </xsl:attribute> 
+      <CharacterStyleRange>
+        <Content><xsl:value-of select="$content"/></Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
   </xsl:template>
 </xsl:stylesheet>
