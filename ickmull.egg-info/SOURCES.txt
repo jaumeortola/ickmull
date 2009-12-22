@@ -1,6 +1,7 @@
 setup.cfg
 setup.py
 ickmull/__init__.py
+ickmull/xhtml.py
 ickmull.egg-info/PKG-INFO
 ickmull.egg-info/SOURCES.txt
 ickmull.egg-info/dependency_links.txt

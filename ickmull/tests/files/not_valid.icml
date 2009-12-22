@@ -1,0 +1,312 @@
+<?xml version="1.0"?>
+<?aid style="50" type="snippet" readerVersion="6.0" featureSet="257" product="6.0(352)"?>
+<?aid SnippetType="InCopyInterchange"?>
+<Document xmlns:xhtml="http://www.w3.org/1999/xhtml" DOMVersion="6.0" Self="d">
+  <RootCharacterStyleGroup Self="foo">
+  <invalid/>
+    <CharacterStyle Self="CharacterStyle/table_figure" Name="table_figure"/>
+    <CharacterStyle Self="CharacterStyle/fnref" Name="fnref"/>
+    <CharacterStyle Self="CharacterStyle/link" Name="link"/>
+    <CharacterStyle Self="CharacterStyle/i" Name="i"/>
+    <CharacterStyle Self="CharacterStyle/italic_sc" Name="italic_sc"/>
+    <CharacterStyle Self="CharacterStyle/sc" Name="sc"/>
+    <CharacterStyle Self="CharacterStyle/b" Name="b"/>
+  </RootCharacterStyleGroup>
+  <RootParagraphStyleGroup Self="u6d">
+    <ParagraphStyle Self="ParagraphStyle/h1" Name="h1"/>
+    <ParagraphStyle Self="ParagraphStyle/h2" Name="h2"/>
+    <ParagraphStyle Self="ParagraphStyle/h3" Name="h3"/>
+    <ParagraphStyle Self="ParagraphStyle/h4" Name="h4"/>
+    <ParagraphStyle Self="ParagraphStyle/pInitial" Name="pInitial"/>
+    <ParagraphStyle Self="ParagraphStyle/p" Name="p"/>
+    <ParagraphStyle Self="ParagraphStyle/ul" Name="ul"/>
+    <ParagraphStyle Self="ParagraphStyle/ol" Name="ol"/>
+    <ParagraphStyle Self="ParagraphStyle/table" Name="table"/>
+    <ParagraphStyle Self="ParagraphStyle/figure_table" Name="figure_table"/>
+    <ParagraphStyle Self="ParagraphStyle/quote" Name="quote"/>
+    <ParagraphStyle Self="ParagraphStyle/reference" Name="reference"/>
+    <ParagraphStyle Self="ParagraphStyle/excerpt" Name="excerpt"/>
+    <ParagraphStyle Self="ParagraphStyle/author" Name="author"/>
+    <ParagraphStyle Self="ParagraphStyle/footnote" Name="footnote"/>
+  </RootParagraphStyleGroup>
+  <Story Self="ud4" AppliedTOCStyle="n" TrackChanges="false" StoryTitle="MyStory" AppliedNamedGrid="n">
+    <StoryPreference OpticalMarginAlignment="false" OpticalMarginSize="12" FrameType="TextFrameType" StoryOrientation="Horizontal" StoryDirection="LeftToRightDirection"/>
+    <InCopyExportOption IncludeGraphicProxies="true" IncludeAllResources="false"/>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h1">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Notes toward v1.0</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h1">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Some brief notes on the CCSP&#x2019;s XHTML-to-IDML script</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/author">
+      <CharacterStyleRange>
+        <Content>by John Maxwell</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Based on our current v0.3: </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
+        <Content>tkbr2icmlv0.3.xsl</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h2">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Introduction</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>The following is, hopefully, enough background to attack the HTML-IDML script. The big picture is simply that this script was prototyped by a couple of people with absolutely no xslt experience. So, while it is functional, it is a mess of spaghetti&#x2014;I am certain that there must be a better way of saying &#x201C;when we see an &lt;em&gt; element, regardless of whether it's in a paragraph, a table cell, or a footnote (etc, etc.), do X with it&#x201D;&#x2014;but I don&#x2019;t have a very good sense of how to do this properly. Another e.g.: we wrote this script specifying &#x201C;xhtml:&#x201D; for each selector, because it only worked that way... it cuts down on readablity, though; do we need it, perhaps by declaring differently? Such are the limits of my knowledge...</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>The second issue is that this needs to be a script which I can be maintain&#x2014;tweak, modify, and add to&#x2014;over time. The editorial workflow that this script supports is still being prototyped, and I&#x2019;m certain that there will be lots of little tweaks to how exactly things get marked up, and how exactly we treat things in InDesign. So cleanliness and some degree of modularity are probably critical&#x2014;we need to design for future changes, to the degree that this is possible.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h2">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Environment</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Our prototype script used xslt v1.0, but Liza indicated that xslt v2.0 would be a better result for handling mixed content models. The caveat is that we want to make the execution environment as minimal as possible. I&#x2019;m currently running my transforms in Tod Ditchendorf&#x2019;s XSLPalette, which handily includes both libxslt and Saxon 8.9 (saving me the hassle of having to install Java components and set environment variables). More importantly, I wouldn&#x2019;t want our target audience&#x2014;small book and journal publishers&#x2014;to have to wrestle with installing development environments. So simplicity is a major virtue.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Ideally, in the future I&#x2019;d like to run this script from within InDesign (as in, FILE&gt;Open Web Page)&#x2014;but that&#x2019;s outside the scope of the current project&#x2014;and I believe that CS4 only supports xslt v1.0. So that can remain a wish-list item for the time being.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>The other environment component is TinyMCE (v3.2), which is what our editors are using. If you have any question about what kind of XHTML to expect, the short answer is: that which TinyMCE produces.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h2">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Adobe Indesign and IDML</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>This entire project is made possible by Adobe&#x2019;s new InDesign file format, IDML, which exposes the entire guts of an InDesign file as XML. The spec is robust, nicely modularized, and well (even &#x201C;nicely&#x201D;) documented. The 1200-page reference is here:</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
+        <Content>http://www.adobe.com/devnet/indesign/pdfs/idml-specification.pdf</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Some samples and quick-start material can be found here:</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
+        <Content>http://www.adobe.com/devnet/indesign/pdfs/idml-cookbook.pdf</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>and general info is here:</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
+        <Content>http://www.adobe.com/products/indesign/scripting/</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h3">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Full IDML vs InCopy subset: ICML</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>IDML represents the totality of an InDesign file. That&#x2019;s a LOT more complexity than we needed. For our purposes&#x2014;which is simply to move web-based content into pre-existing InDesign templates&#x2014;all we need is the &#x201C;Story&#x201D; part of an InDesign file. Helpfully, Adobe thought of this already: Adobe&#x2019;s </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
+        <Content>InCopy </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>software (originally designed for simultaneous editor/designer interaction in a newsroom) uses a subset of IDML called ICML (as of the CS4 version). So, to make a long story short, what we are really producing here are ICML files, which can then be &#x201C;placed&#x201D; in an InDesign template (which has master pages, styles, and so on pre-defined). Or, to put it differently, we&#x2019;re effectively replacing InCopy with the web.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h3">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>ICML Basic Structures</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>IDML&#x2019;s content structures (which make up the bulk of ICML) are really simple:</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
+        <Content>ParagraphStyleRange </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>elements define chunks of text that inherit a particular named style. Within those are </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
+        <Content>CharacterStyleRange </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>elements, which do the same thing. They&#x2019;re like divs and spans, except that </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
+        <Content>all </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>content needs to be in a CharacterStyleRange, even though it may be unstyled. It&#x2019;s verbose as hell, but it&#x2019;s exactly two layers deep: not complicated.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Oh... and line breaks are done manually, which explains the &lt;br /&gt; in the middle of each handler.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>The only &#x2018;magic&#x2019; ICML requires is a couple of boilerplate PIs and that all the named Styles are declared at the top of the ICML file. They don't have to be defined, just declared.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
+        <Content>Images </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>are relatively straightforward. The only hitch is that they have a size/co-ordinates system which must be converted from width and height attributes&#x2014;a little arithmetic, which you&#x2019;ll see in our script.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
+        <Content>Tables </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>are more hairy, because the InDesign table model is </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
+        <Content>completely </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>different from the HTML table model: column and row counts are declared up front, and then everything is done cell-by-cell. This requires some processing, and in our prototype, you can see a barely functional version cribbed more or less straight from Adobe&#x2019;s IDML cookbook. Making this perfectly intellegent and robust is not a high priority, but I'm very interested to hear what you think could be done with it.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h3">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Quick start: how it works</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Beginning with an HTML document (this one, for instance), we merely save a clean XHTML copy out of the browser (the "Clean XHTML export" link on the left does the work for you). Firefox's "Save as Web Page - HTML Only" produces an XHTML-declared version.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Run the resulting HTML against the XSLT, and give the result a .icml extension. Then, open up a </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
+        <Content>template file</Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>in InDesign CS4. In InDesign, File-&gt;Place... the .icml file, and shift-click to &#x201C;auto-flow&#x201D; (generating additional pages as needed).</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h2">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Some extra niceties:</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>You&#x2019;ll notice in the prototype that there&#x2019;s a simple mechanism for distinguishing between initial paragraphs and following paragraphs, so that these can be styled distinctly in InDesign (flush and indented, respectively). I did this as a bit of a show-off (see what you can do with XML!), but also because it is a mark of typographic excellence, and that&#x2019;s what we're after.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Footnote support is pretty rudimentary. You'll see in here a table-based footnote structure that comes from the reStructuredText system in ZWiki -- which I have since abandoned in favour of TinyMCE, which does a passable job of making functional end-notes out of content pasted in from MSWord (and since our journal publishers especially really like this), this probably needs to be rewritten in the future to support whatever our editors want to with footnotes (currently they don't know). The bottom line is: for the short term however, it&#x2019;s not a high priority, but this is one of those areas where I will need to make changes to the script to adapt it to editorial needs.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Quick-and-dirty metadata is handled by assigning &#x2018;semantic&#x2019; class names to particular paragraphs (e.g.; &lt;p class="dc-creator"&gt;John Maxwell&lt;/p&gt;). This is simple enough, and also imperfect enough that what it really needs is </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
+        <Content>flexibility </Content>
+      </CharacterStyleRange>
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>. This is one of the key areas of this script where I can imagine going in and changing the behaviour over time: how the metadata is represented in the HTML, how it maps to InDesign styles, etc. What I had imagined was a fair number of possibilities for p classes, all assembled in such a way as to make quick script modifications easy. Open to suggestions about how to handle this...</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>Do I have to say, in 2009, that we just assume Unicode throughout, and not bother at all with those nasty character entities? I probably do. OK, there, I said it.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/h2">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+        <Content>Distribution and deployment</Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>My intent is to release this under GPL. The only reason I haven&#x2019;t already is that there are chunks of this script cribbed straight from Adobe&#x2019;s cookbook, and I didn&#x2019;t want to go GPLing something that wasn&#x2019;t mine. Any distance you can take us toward this would be appreciated.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
+      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
+        <Content>The overall agenda is to release this into the wild as a usable proof-of-concept (right now it is a not-quite-usable proof of concept) that people can pick up and work with. I have no intention of selling it or otherwise managing it on a commercial basis&#x2014;apart from using it in a consulting context. I&#x2019;m more interested in demonstrating to publishers that this way of working is possible and easily acheivable. Of course, the script and basic approach could be taken miles farther.</Content>
+      </CharacterStyleRange>
+      <Br/>
+    </ParagraphStyleRange>
+  </Story>
+</Document>
