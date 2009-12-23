@@ -81,6 +81,8 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
         <InCopyExportOption IncludeGraphicProxies="true" IncludeAllResources="false"/>
         <xsl:apply-templates/>
       </Story>
+      <xsl:apply-templates select=".//xhtml:a" mode="hyperlink-url-destinations"/>
+      <xsl:apply-templates select=".//xhtml:a" mode="hyperlinks"/>
     </Document>
   </xsl:template>
 
@@ -141,7 +143,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
        follows any first- through third-level heading (h1-h3) should
        be given a paragraph style 'pInitial' in InDesign. -->
   <xsl:template match="xhtml:p[not(@class)]
-                              [preceding-sibling::*[1]
+                              [preceding-sibling[1]
                                                    [self::xhtml:h1|
                                                     self::xhtml:h2|
                                                     self::xhtml:h3]]">
@@ -157,30 +159,31 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
   </xsl:template>    
 
   <!-- Lists -->
-  <xsl:template match="xhtml:ul">
-    <xsl:for-each select="xhtml:li">
-      <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/ul">
-        <CharacterStyleRange>
-          <Content>
-            <xsl:value-of select="."/>
-          </Content>
-          <Br/>
-        </CharacterStyleRange>
-      </ParagraphStyleRange>
-    </xsl:for-each>
+  <!-- TODO: What about other children of the li? What about multiple children
+       on a single li? -->
+  <xsl:template match="xhtml:ol/xhtml:li[*]|
+                       xhtml:ul/xhtml:li[*]">
+    <xsl:if test="count(*) &gt; 1">
+      <xsl:message terminate="yes">Multi-element list items not handled!
+</xsl:message>
+    </xsl:if>
+    <xsl:if test="*[not(self::xhtml:p)]">
+      <xsl:message terminate="yes">Non-paragraph list children not handled!
+</xsl:message>
+    </xsl:if>
+    <xsl:apply-templates/>
   </xsl:template>
-
-  <xsl:template match="xhtml:ol">
-    <xsl:for-each select="xhtml:li">
-      <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/ol">
-        <CharacterStyleRange>
-          <Content>
-            <xsl:value-of select="."/>
-          </Content>
-          <Br/>
-        </CharacterStyleRange>
-      </ParagraphStyleRange>
-    </xsl:for-each>
+  <xsl:template match="xhtml:ol/xhtml:li/xhtml:p|
+                       xhtml:ol/xhtml:li[not(*)]">
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">ol</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+  <xsl:template match="xhtml:ul/xhtml:li/xhtml:p|
+                       xhtml:ul/xhtml:li[not(*)]">
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">ul</xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
 
@@ -289,10 +292,52 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
 
   <!-- Links -->
   <xsl:template match="xhtml:a" mode="character-style-range">
-    <xsl:call-template name="char-style-range">
-      <xsl:with-param name="style-name">link</xsl:with-param>
-    </xsl:call-template>
+    <xsl:variable name="hyperlink-key" select="count(preceding::xhtml:a) + 1"/>
+    <xsl:variable name="self" select="concat('htss-', $hyperlink-key)"/>
+    <xsl:variable name="name" select="."/>
+    <CharacterStyleRange>
+      <xsl:attribute name="AppliedCharacterStyle">CharacterStyle/link</xsl:attribute> 
+      <HyperlinkTextSource Self="{$self}" Name="{$name}" Hidden="false">
+        <Content><xsl:value-of select="."/></Content>
+      </HyperlinkTextSource>  
+    </CharacterStyleRange>
   </xsl:template>  
+
+  <!-- TODO: Support for internal hyperlinks -->
+  <xsl:template match="xhtml:a[not(@href)]" mode="hyperlinks"/>
+  <xsl:template match="xhtml:a[not(@href)]" mode="hyperlink-url-destinations"/>
+
+  <xsl:template match="xhtml:a[@href]" mode="hyperlink-url-destinations">
+    <xsl:variable name="hyperlink-key" select="count(preceding::xhtml:a) + 1"/>
+    <xsl:variable name="hyperlink-text-source-self" select="concat('htss-', $hyperlink-key)"/>
+    <xsl:variable name="hyperlink-url-destination-self" select="concat('huds-', $hyperlink-key)"/>
+    <xsl:variable name="hyperlink-text-source-name" select="."/>
+    <xsl:variable name="destination-unique-key" select="$hyperlink-key"/>
+    <HyperlinkURLDestination Self="{$hyperlink-url-destination-self}" 
+                             Name="{$hyperlink-text-source-name}"
+                             DestinationURL="{@href}" 
+                             DestinationUniqueKey="{$destination-unique-key}"/> 
+  </xsl:template>  
+
+  <xsl:template match="xhtml:a[@href]" mode="hyperlinks">
+    <xsl:variable name="hyperlink-key" select="count(preceding::xhtml:a) + 1"/>
+    <xsl:variable name="hyperlink-self" select="concat('hs-', $hyperlink-key)"/>
+    <xsl:variable name="hyperlink-url-destination-self" select="concat('huds-', $hyperlink-key)"/>
+    <xsl:variable name="hyperlink-text-source-self" select="concat('htss-', $hyperlink-key)"/>
+    <xsl:variable name="hyperlink-text-source-name" select="."/>
+    <xsl:variable name="destination-unique-key" select="$hyperlink-key"/>
+    <Hyperlink Self="{$hyperlink-self}" 
+               Name="{$hyperlink-text-source-name}" 
+               Source="{$hyperlink-text-source-self}" 
+               Visible="true" 
+               DestinationUniqueKey="{$destination-unique-key}">
+      <Properties>
+        <BorderColor type="enumeration">Black</BorderColor>
+        <Destination type="object"><xsl:value-of select="$hyperlink-url-destination-self"/></Destination>
+      </Properties>
+    </Hyperlink>
+  </xsl:template>  
+
 
   <!-- Inlines -->
   <xsl:template match="xhtml:em|xhtml:i" mode="character-style-range">
