@@ -84,415 +84,79 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
     </Document>
   </xsl:template>
 
-  <xsl:template match="xhtml:h1|xhtml:h2|xhtml:h3|xhtml:h4|xhtml:h5|xhtml:h6">
+  <!-- Headings -->
+  <xsl:template match="xhtml:h1|
+                       xhtml:h2|
+                       xhtml:h3|
+                       xhtml:h4|
+                       xhtml:h5|
+                       xhtml:h6">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name" select="name()"/>
-      <xsl:with-param name="content" select="."/>
     </xsl:call-template>
   </xsl:template>
 
 
+  <!-- Document metadata -->
   <xsl:template match="xhtml:p[@class='dc-creator']">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">author</xsl:with-param>
-      <xsl:with-param name="content" select="concat('by ', .)"/>
+      <xsl:with-param name="prefix-content">by </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
+
+  <!-- Paras and block-level elements -->
+  <xsl:template match="xhtml:p[not(@class)]">
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">p</xsl:with-param>
+    </xsl:call-template>
+              <!-- TODO : Why was this needed ? 
+              <xsl:when test="self::xhtml:a[@class='footnote-reference']">
+                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
+                  <Content>
+                    <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
+                    <xsl:if test="position() != last()">
+                      <xsl:text> </xsl:text>
+                    </xsl:if>
+                  </Content>
+                </CharacterStyleRange>
+              </xsl:when>
+              -->
+  </xsl:template>
+
+  <!-- TODO: Why not just always use the @class for the style-name?-->
   <xsl:template match="xhtml:p[@class='excerpt' or
                                @class='figure_table' or
                                @class='index' or
                                @class='index_sub' or
+                               @class='quote' or
                                @class='quote_ind' or
                                @class='reference']">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name" select="@class"/>
-      <xsl:with-param name="content" select="."/>
     </xsl:call-template>
   </xsl:template>
-  <xsl:template match="xhtml:p[@class='quote']">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/quote">
-      <xsl:for-each select="*|text()">
-        <xsl:choose>
-          <xsl:when test="self::xhtml:span[@class='table_figure']">
-            <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
-              <Content>
-                <xsl:value-of select="normalize-space(.)"/>
-                <xsl:if test="position() != last()">
-                  <xsl:text> </xsl:text>
-                </xsl:if>
-              </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-          <xsl:when test="self::xhtml:i">
-            <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
-              <Content>
-                <xsl:value-of select="normalize-space(.)"/>
-                <xsl:if test="position() != last()">
-                  <xsl:text> </xsl:text>
-                </xsl:if>
-              </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-          <xsl:when test="self::xhtml:span[@class='italic_sc']">
-            <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic_sc">
-              <Content>
-                <xsl:value-of select="normalize-space(.)"/>
-                <xsl:if test="position() != last()">
-                  <xsl:text> </xsl:text>
-                </xsl:if>
-              </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-          <xsl:when test="self::xhtml:span[@class='sc']">
-            <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/sc">
-              <Content>
-                <xsl:value-of select="normalize-space(.)"/>
-                <xsl:if test="position() != last()">
-                  <xsl:text> </xsl:text>
-                </xsl:if>
-              </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-          <xsl:when test="self::xhtml:b">
-            <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
-              <Content>
-                <xsl:value-of select="normalize-space(.)"/>
-                <xsl:if test="position() != last()">
-                  <xsl:text> </xsl:text>
-                </xsl:if>
-              </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-          <xsl:when test="self::text()">
-            <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
-              <Content>
-                <xsl:value-of select="normalize-space(.)"/>
-                <xsl:if test="position() != last()">
-                  <xsl:text> </xsl:text>
-                </xsl:if>
-              </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-        </xsl:choose>
-      </xsl:for-each>
-      <Br/>
-    </ParagraphStyleRange>
+
+  <!-- An unadorned (no @class attribute) p element that *directly*
+       follows any first- through third-level heading (h1-h3) should
+       be given a paragraph style 'pInitial' in InDesign. -->
+  <xsl:template match="xhtml:p[not(@class)]
+                              [preceding-sibling::*[1]
+                                                   [self::xhtml:h1|
+                                                    self::xhtml:h2|
+                                                    self::xhtml:h3]]">
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">pInitial</xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="xhtml:div[@class='footnotes']/xhtml:p">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
-
-  <xsl:template match="xhtml:p">
-    <xsl:choose>
-      <xsl:when test="preceding-sibling::*[1][self::xhtml:p]">
-        <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/p">
-          <xsl:for-each select="*|text()">
-            <xsl:choose>
-              <xsl:when test="self::xhtml:a[@class='footnote-reference']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
-                  <Content>
-                    <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:span[@class='table_figure']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:a">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
-                  <Content>
-                    <xsl:value-of select="."/>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:i">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:em">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:span[@class='italic_sc']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic_sc">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:span[@class='sc']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/sc">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:b">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:strong">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::text()">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:for-each>
-          <Br/>
-        </ParagraphStyleRange>
-      </xsl:when>
-      <xsl:otherwise>
-        <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/pInitial">
-          <xsl:for-each select="*|text()">
-            <xsl:choose>
-              <xsl:when test="self::xhtml:a[@class='footnote-reference']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
-                  <Content>
-                    <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:span[@class='table_figure']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:a">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
-                  <Content>
-                    <xsl:value-of select="."/>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:i">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:em">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:span[@class='italic_sc']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic_sc">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:span[@class='sc']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/sc">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:b">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::xhtml:strong">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              <xsl:when test="self::text()">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
-                  <Content>
-                    <xsl:value-of select="normalize-space(.)"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:for-each>
-          <Br/>
-        </ParagraphStyleRange>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  <xsl:template match="xhtml:table[@class='docutils footnote']/xhtml:tbody/xhtml:tr">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
-      <xsl:for-each select="xhtml:td">
-        <xsl:choose>
-          <xsl:when test="self::xhtml:td[@class='label']">
-            <CharacterStyleRange>
-              <Content><xsl:value-of select="substring-before(substring-after(.,'['),']')"/>. </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-          <xsl:otherwise>
-            <Content>
-              <xsl:value-of select="."/>
-            </Content>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
-    </ParagraphStyleRange>
-    <Br/>
-  </xsl:template>
   <xsl:template match="xhtml:blockquote">
-    <xsl:for-each select="xhtml:p">
-      <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/quote">
-        <xsl:for-each select="*|text()">
-          <xsl:choose>
-            <xsl:when test="self::xhtml:a[@class='footnote-reference']">
-              <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
-                <Content>
-                  <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
-                  <xsl:if test="position() != last()">
-                    <xsl:text> </xsl:text>
-                  </xsl:if>
-                </Content>
-              </CharacterStyleRange>
-            </xsl:when>
-            <xsl:when test="self::xhtml:a">
-              <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/link">
-                <Content>
-                  <xsl:value-of select="."/>
-                </Content>
-              </CharacterStyleRange>
-            </xsl:when>
-            <xsl:when test="self::xhtml:em">
-              <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/i">
-                <Content>
-                  <xsl:value-of select="normalize-space(.)"/>
-                  <xsl:if test="position() != last()">
-                    <xsl:text> </xsl:text>
-                  </xsl:if>
-                </Content>
-              </CharacterStyleRange>
-            </xsl:when>
-            <xsl:when test="self::xhtml:b">
-              <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
-                <Content>
-                  <xsl:value-of select="normalize-space(.)"/>
-                  <xsl:if test="position() != last()">
-                    <xsl:text> </xsl:text>
-                  </xsl:if>
-                </Content>
-              </CharacterStyleRange>
-            </xsl:when>
-            <xsl:when test="self::xhtml:strong">
-              <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/b">
-                <Content>
-                  <xsl:value-of select="normalize-space(.)"/>
-                  <xsl:if test="position() != last()">
-                    <xsl:text> </xsl:text>
-                  </xsl:if>
-                </Content>
-              </CharacterStyleRange>
-            </xsl:when>
-            <xsl:when test="self::text()">
-              <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/[No character style]">
-                <Content>
-                  <xsl:value-of select="normalize-space(.)"/>
-                  <xsl:if test="position() != last()">
-                    <xsl:text> </xsl:text>
-                  </xsl:if>
-                </Content>
-              </CharacterStyleRange>
-            </xsl:when>
-          </xsl:choose>
-        </xsl:for-each>
-        <Br/>
-      </ParagraphStyleRange>
-    </xsl:for-each>
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">quote</xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
+
+  <!-- Lists -->
   <xsl:template match="xhtml:ul">
     <xsl:for-each select="xhtml:li">
       <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/ul">
@@ -505,6 +169,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       </ParagraphStyleRange>
     </xsl:for-each>
   </xsl:template>
+
   <xsl:template match="xhtml:ol">
     <xsl:for-each select="xhtml:li">
       <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/ol">
@@ -518,21 +183,8 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
     </xsl:for-each>
   </xsl:template>
 
-  <xsl:template match="xhtml:br">
-    <xsl:text>
-</xsl:text>
-    <xsl:apply-templates/>
-  </xsl:template>
 
-  <xsl:template match="xhtml:span[@class='table_figure']">
-    <ParagraphStyleRange>
-      <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/table_figure">
-        <Content>
-          <xsl:apply-templates/>
-        </Content>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
+  <!-- Tables -->
   <xsl:template match="xhtml:table[@class='docutils']/xhtml:tbody">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/table">
       <CharacterStyleRange>
@@ -594,26 +246,153 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
       <Br/>
     </xsl:if>
   </xsl:template>
+
+  <!-- Images -->
   <xsl:template match="xhtml:img">
-    <ParagraphStyleRange>foo
-            <CharacterStyleRange><xsl:variable name="halfwidth" select="@width div 2"/><xsl:variable name="halfheight" select="@height div 2"/><Rectangle Self="uec" ItemTransform="1 0 0 1 {$halfwidth} -{$halfheight}"><Properties><PathGeometry><GeometryPathType PathOpen="false"><PathPointArray><PathPointType Anchor="-{$halfwidth} -{$halfheight}" LeftDirection="-{$halfwidth} -{$halfheight}" RightDirection="-{$halfwidth} -{$halfheight}"/><PathPointType Anchor="-{$halfwidth} {$halfheight}" LeftDirection="-{$halfwidth} {$halfheight}" RightDirection="-{$halfwidth} {$halfheight}"/><PathPointType Anchor="{$halfwidth} {$halfheight}" LeftDirection="{$halfwidth} {$halfheight}" RightDirection="{$halfwidth} {$halfheight}"/><PathPointType Anchor="{$halfwidth} -{$halfheight}" LeftDirection="{$halfwidth} -{$halfheight}" RightDirection="{$halfwidth} -{$halfheight}"/></PathPointArray></GeometryPathType></PathGeometry></Properties><Image Self="ue6" ItemTransform="1 0 0 1 -{$halfwidth} -{$halfheight}"><Properties><Profile type="string">$ID/Embedded</Profile><GraphicBounds Left="0" Top="0" Right="{@width}" Bottom="{@height}"/></Properties><Link Self="ueb" LinkResourceURI="file:///{@src}"/></Image></Rectangle><Br/></CharacterStyleRange>
-        </ParagraphStyleRange>
+    <xsl:variable name="halfwidth" select="@width div 2"/>
+    <xsl:variable name="halfheight" select="@height div 2"/>
+    <ParagraphStyleRange>
+      <CharacterStyleRange>
+        <Rectangle Self="uec" ItemTransform="1 0 0 1 {$halfwidth} -{$halfheight}">
+          <Properties>
+            <PathGeometry>
+              <GeometryPathType PathOpen="false">
+                <PathPointArray>
+                  <PathPointType Anchor="-{$halfwidth} -{$halfheight}" 
+                                 LeftDirection="-{$halfwidth} -{$halfheight}" 
+                                 RightDirection="-{$halfwidth} -{$halfheight}"/>
+                  <PathPointType Anchor="-{$halfwidth} {$halfheight}" 
+                                 LeftDirection="-{$halfwidth} {$halfheight}" 
+                                 RightDirection="-{$halfwidth} {$halfheight}"/>
+                  <PathPointType Anchor="{$halfwidth} {$halfheight}" 
+                                 LeftDirection="{$halfwidth} {$halfheight}" 
+                                 RightDirection="{$halfwidth} {$halfheight}"/>
+                  <PathPointType Anchor="{$halfwidth} -{$halfheight}" 
+                                 LeftDirection="{$halfwidth} -{$halfheight}" 
+                                 RightDirection="{$halfwidth} -{$halfheight}"/>
+                </PathPointArray>
+              </GeometryPathType>
+            </PathGeometry>
+          </Properties>
+          <Image Self="ue6" ItemTransform="1 0 0 1 -{$halfwidth} -{$halfheight}">
+            <Properties>
+              <Profile type="string">$ID/Embedded</Profile>
+              <GraphicBounds Left="0" Top="0" Right="{@width}" Bottom="{@height}"/>
+            </Properties>
+            <Link Self="ueb" LinkResourceURI="file:///{@src}"/>
+          </Image>
+        </Rectangle>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+  </xsl:template>
+
+  <!-- Links -->
+  <xsl:template match="xhtml:a" mode="character-style-range">
+    <xsl:call-template name="char-style-range">
+      <xsl:with-param name="style-name">link</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>  
+
+  <!-- Inlines -->
+  <xsl:template match="xhtml:em|xhtml:i" mode="character-style-range">
+    <xsl:call-template name="char-style-range">
+      <xsl:with-param name="style-name">i</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>  
+
+  <xsl:template match="xhtml:strong|xhtml:b" mode="character-style-range">
+    <xsl:call-template name="char-style-range">
+      <xsl:with-param name="style-name">b</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>  
+
+  <xsl:template match="xhtml:span[@class][not(@class='footnote-reference')]" mode="character-style-range">
+    <xsl:call-template name="char-style-range">
+      <xsl:with-param name="style-name" select="@class"/>
+    </xsl:call-template>
+  </xsl:template>  
+
+  <xsl:template match="text()" mode="character-style-range">
+    <xsl:call-template name="char-style-range">
+      <xsl:with-param name="style-name">[No character style]</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="xhtml:br" mode="character-style-range">
+    <Br/> <!-- TODO: Is this always going to appear in an acceptable location? -->
+  </xsl:template>
+
+
+  <!-- TODO -->
+  <!-- Footnotes -->
+  <xsl:template match="xhtml:table[@class='docutils footnote']/xhtml:tbody/xhtml:tr">
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
+      <xsl:for-each select="xhtml:td">
+        <xsl:choose>
+          <xsl:when test="self::xhtml:td[@class='label']">
+            <CharacterStyleRange>
+              <Content><xsl:value-of select="substring-before(substring-after(.,'['),']')"/>. </Content>
+            </CharacterStyleRange>
+          </xsl:when>
+          <xsl:otherwise>
+            <Content>
+              <xsl:value-of select="."/>
+            </Content>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </ParagraphStyleRange>
+    <Br/>
+  </xsl:template>
+  <xsl:template match="xhtml:div[@class='footnotes']/xhtml:p">
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
+      <CharacterStyleRange>
+        <Content>
+          <xsl:value-of select="."/>
+        </Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
   </xsl:template>
 
   <!-- ==================================================================== -->
   <!-- Named templates -->
   <!-- ==================================================================== -->
   <xsl:template name="para-style-range">
+    <!-- The name of the paragraph style in InDesign -->
     <xsl:param name="style-name"/> 
-    <xsl:param name="content" select="."/>
+    <!-- A string of text that will precede the paragraph's actual content (ex: 'by ')-->
+    <xsl:param name="prefix-content" select="''"/>
     <ParagraphStyleRange>
       <xsl:attribute name="AppliedParagraphStyle">
         <xsl:value-of select="concat('ParagraphStyle/', $style-name)"/>
       </xsl:attribute> 
-      <CharacterStyleRange>
-        <Content><xsl:value-of select="$content"/></Content>
-        <Br/>
-      </CharacterStyleRange>
+      <xsl:if test="$prefix-content != ''">
+        <CharacterStyleRange>
+          <Content><xsl:value-of select="$prefix-content"/></Content>
+        </CharacterStyleRange>  
+      </xsl:if>
+      <xsl:apply-templates select="text()|*" mode="character-style-range"/>
+      <Br/>
     </ParagraphStyleRange>
+  </xsl:template>
+
+
+  <xsl:template name="char-style-range">
+    <!-- The name of the character style in InDesign -->
+    <xsl:param name="style-name"/> 
+
+    <CharacterStyleRange>
+      <xsl:attribute name="AppliedCharacterStyle">
+        <xsl:value-of select="concat('CharacterStyle/', $style-name)"/>
+      </xsl:attribute> 
+      <Content><xsl:value-of select="."/></Content>
+                <!-- TODO : Why was this needed ? 
+                <xsl:if test="position() != last()">
+                  <xsl:text> </xsl:text>
+                </xsl:if>
+                -->
+    </CharacterStyleRange>  
   </xsl:template>
 </xsl:stylesheet>
