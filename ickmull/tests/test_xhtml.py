@@ -56,7 +56,7 @@ class TestXHTML(object):
                 # output small
                 diff = '\n'.join(list(difflib.unified_diff(etree.tostring(expected_icml, pretty_print=True).splitlines(),
                                                            etree.tostring(icml, pretty_print=True).splitlines())))
-                raise AssertionError('XML documents did not match. Diff:\n%s' % diff)
+                raise AssertionError('XML documents for %s did not match. Diff:\n%s' % (xhtml_docname, diff))
 
     def test_xhtml_icml_output_valid_smoke(self):
         """All XHTML documents collected for smoketesting should be able to be transformed into an ICML document that passes validation."""

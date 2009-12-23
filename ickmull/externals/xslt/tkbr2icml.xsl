@@ -28,7 +28,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
 -->
 <xsl:stylesheet xmlns:xhtml="http://www.w3.org/1999/xhtml" 
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-                omit-result-prefixes="xhtml"
+                exclude-result-prefixes="xhtml"
                 version="1.0">
 
   <xsl:param name="table-width">540</xsl:param>
@@ -150,11 +150,11 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="xhtml:blockquote">
+  <xsl:template match="xhtml:blockquote/xhtml:p">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">quote</xsl:with-param>
     </xsl:call-template>
-  </xsl:template>
+  </xsl:template>    
 
   <!-- Lists -->
   <xsl:template match="xhtml:ul">
