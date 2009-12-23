@@ -24,7 +24,7 @@ CHANGES
 v0.2 - JMax: Nov 2009. Tweaks to make this work with TinyMCE's content rather than the HTML that ZWiki's ReStructured Text creates.
 v0.2.5 - Meghan: Dec 2009. Added handlers for crude p-level metadata
 v0.3 - JMax: merged 0.2 and 0.25, tweaked support for "a" links
-v0.4 - Keith Fahlgren: Refactored XSLT for clarity and extensibility
+v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibility; added support for hyperlinks
 -->
 <xsl:stylesheet xmlns:xhtml="http://www.w3.org/1999/xhtml" 
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
