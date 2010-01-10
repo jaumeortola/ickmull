@@ -16,7 +16,7 @@
 <h1>Notes toward v1.0</h1>
 <h1>Some brief notes on the CCSP’s XHTML-to-IDML script</h1>
 <p class="dc-creator">John Maxwell</p>
-<p>Based on our current v0.3: <a href="uploads/tkbr2icmlv0.3.xsl">tkbr2icmlv0.3.xsl</a></p>
+<p>Based on our current v0.3: <a href="uploads/xhtml2icmlv0.3.xsl">xhtml2icmlv0.3.xsl</a></p>
 <h2>Introduction</h2>
 <p>The following is, hopefully, enough background to attack the HTML-IDML script. The big picture is simply that this script was prototyped by a couple of people with absolutely no xslt experience. So, while it is functional, it is a mess of spaghetti—I am certain that there must be a better way of saying “when we see an &lt;em&gt; element, regardless of whether it's in a paragraph, a table cell, or a footnote (etc, etc.), do X with it”—but I don’t have a very good sense of how to do this properly. Another e.g.: we wrote this script specifying “xhtml:” for each selector, because it only worked that way... it cuts down on readablity, though; do we need it, perhaps by declaring differently? Such are the limits of my knowledge...</p>
 <p>The second issue is that this needs to be a script which I can be maintain—tweak, modify, and add to—over time. The editorial workflow that this script supports is still being prototyped, and I’m certain that there will be lots of little tweaks to how exactly things get marked up, and how exactly we treat things in InDesign. So cleanliness and some degree of modularity are probably critical—we need to design for future changes, to the degree that this is possible.</p>

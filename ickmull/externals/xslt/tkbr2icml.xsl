@@ -49,8 +49,8 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <xsl:template match="xhtml:body">
     <xsl:processing-instruction name="aid"><xsl:value-of select="$icml-decl-pi"/></xsl:processing-instruction>
     <xsl:processing-instruction name="aid"><xsl:value-of select="$snippet-type-pi"/></xsl:processing-instruction>
-    <Document DOMVersion="6.0" Self="tkbr2icml_document">
-      <RootCharacterStyleGroup Self="tkbr2icml_character_styles">
+    <Document DOMVersion="6.0" Self="xhtml2icml_document">
+      <RootCharacterStyleGroup Self="xhtml2icml_character_styles">
         <CharacterStyle Self="CharacterStyle/table_figure" Name="table_figure"/>
         <CharacterStyle Self="CharacterStyle/fnref" Name="fnref"/>
         <CharacterStyle Self="CharacterStyle/link" Name="link"/>
@@ -59,7 +59,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
         <CharacterStyle Self="CharacterStyle/sc" Name="sc"/>
         <CharacterStyle Self="CharacterStyle/b" Name="b"/>
       </RootCharacterStyleGroup>
-      <RootParagraphStyleGroup Self="tkbr2icml_paragraph_styles">
+      <RootParagraphStyleGroup Self="xhtml2icml_paragraph_styles">
         <ParagraphStyle Self="ParagraphStyle/h1" Name="h1"/>
         <ParagraphStyle Self="ParagraphStyle/h2" Name="h2"/>
         <ParagraphStyle Self="ParagraphStyle/h3" Name="h3"/>
@@ -76,7 +76,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
         <ParagraphStyle Self="ParagraphStyle/author" Name="author"/>
         <ParagraphStyle Self="ParagraphStyle/footnote" Name="footnote"/>
       </RootParagraphStyleGroup>
-      <Story Self="tkbr2icml_default_story" AppliedTOCStyle="n" TrackChanges="false" StoryTitle="MyStory" AppliedNamedGrid="n">
+      <Story Self="xhtml2icml_default_story" AppliedTOCStyle="n" TrackChanges="false" StoryTitle="MyStory" AppliedNamedGrid="n">
         <StoryPreference OpticalMarginAlignment="false" OpticalMarginSize="12" FrameType="TextFrameType" StoryOrientation="Horizontal" StoryDirection="LeftToRightDirection"/>
         <InCopyExportOption IncludeGraphicProxies="true" IncludeAllResources="false"/>
         <xsl:apply-templates/>
@@ -112,18 +112,6 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">p</xsl:with-param>
     </xsl:call-template>
-              <!-- TODO : Why was this needed ? 
-              <xsl:when test="self::xhtml:a[@class='footnote-reference']">
-                <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/fnref">
-                  <Content>
-                    <xsl:value-of select="substring-before(substring-after(.,'['),']')"/>
-                    <xsl:if test="position() != last()">
-                      <xsl:text> </xsl:text>
-                    </xsl:if>
-                  </Content>
-                </CharacterStyleRange>
-              </xsl:when>
-              -->
   </xsl:template>
 
   <!-- TODO: Why not just always use the @class for the style-name?-->
@@ -146,7 +134,11 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
                               [preceding-sibling[1]
                                                    [self::xhtml:h1|
                                                     self::xhtml:h2|
-                                                    self::xhtml:h3]]">
+                                                    self::xhtml:h3|
+                                                    self::xhtml:h4|
+                                                    self::xhtml:h5|
+                                                    self::xhtml:h6|
+                                                    self::xhtml:blockquote]]">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">pInitial</xsl:with-param>
     </xsl:call-template>
@@ -433,11 +425,6 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
         <xsl:value-of select="concat('CharacterStyle/', $style-name)"/>
       </xsl:attribute> 
       <Content><xsl:value-of select="."/></Content>
-                <!-- TODO : Why was this needed ? 
-                <xsl:if test="position() != last()">
-                  <xsl:text> </xsl:text>
-                </xsl:if>
-                -->
     </CharacterStyleRange>  
   </xsl:template>
 </xsl:stylesheet>
