@@ -41,6 +41,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     <xsl:text>SnippetType="InCopyInterchange"</xsl:text>
   </xsl:variable>  
 
+
   <!-- Default Rule: Match everything, ignore it,  and keep going "down". -->
   <xsl:template match="@*|node()">
     <xsl:apply-templates select="@*|node()"/>
@@ -299,6 +300,10 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <xsl:template match="xhtml:a[not(@href)]" mode="hyperlinks"/>
   <xsl:template match="xhtml:a[not(@href)]" mode="hyperlink-url-destinations"/>
 
+  <!-- ..but not footnotes -->
+  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote')]" mode="hyperlinks"/>
+  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote')]" mode="hyperlink-url-destinations"/>
+
   <xsl:template match="xhtml:a[@href]" mode="hyperlink-url-destinations">
     <xsl:variable name="hyperlink-key" select="count(preceding::xhtml:a) + 1"/>
     <xsl:variable name="hyperlink-text-source-self" select="concat('htss-', $hyperlink-key)"/>
@@ -344,7 +349,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     </xsl:call-template>
   </xsl:template>  
 
-  <xsl:template match="xhtml:span[@class][not(@class='footnote-reference')]" mode="character-style-range">
+  <xsl:template match="xhtml:span[@class]" mode="character-style-range">
     <xsl:call-template name="char-style-range">
       <xsl:with-param name="style-name" select="@class"/>
     </xsl:call-template>
@@ -360,39 +365,42 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     <Br/> <!-- TODO: Is this always going to appear in an acceptable location? -->
   </xsl:template>
 
+  <xsl:template match="xhtml:sub" mode="character-style-range">
+    <xsl:call-template name="char-style-range">
+      <xsl:with-param name="style-name">[No character style]</xsl:with-param>
+      <xsl:with-param name="vertical-position">Subscript</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>  
 
-  <!-- TODO -->
-  <!-- Footnotes -->
-  <xsl:template match="xhtml:table[@class='docutils footnote']/xhtml:tbody/xhtml:tr">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
-      <xsl:for-each select="xhtml:td">
-        <xsl:choose>
-          <xsl:when test="self::xhtml:td[@class='label']">
-            <CharacterStyleRange>
-              <Content><xsl:value-of select="substring-before(substring-after(.,'['),']')"/>. </Content>
-            </CharacterStyleRange>
-          </xsl:when>
-          <xsl:otherwise>
-            <Content>
-              <xsl:value-of select="."/>
-            </Content>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
-    </ParagraphStyleRange>
-    <Br/>
-  </xsl:template>
-  <xsl:template match="xhtml:div[@class='footnotes']/xhtml:p">
-    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
-      <CharacterStyleRange>
-        <Content>
-          <xsl:value-of select="."/>
-        </Content>
-        <Br/>
-      </CharacterStyleRange>
-    </ParagraphStyleRange>
-  </xsl:template>
+  <xsl:template match="xhtml:sup" mode="character-style-range">
+    <xsl:call-template name="char-style-range">
+      <xsl:with-param name="style-name">[No character style]</xsl:with-param>
+      <xsl:with-param name="vertical-position">Superscript</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>  
 
+
+  <!-- Footnotes. 
+
+       Ignore the target anchors in the footnote "body" and insert the
+       footnote markup at the point in the text where the superscripted/boxed
+       footnote anchor appears. 
+
+       Additionally, we must ignore the footnoe content paragraphs where they
+       actually appear in the document. -->
+  <xsl:template match="xhtml:*/xhtml:a[contains(@name, 'sdfootnote')]"  mode="character-style-range"/>
+  <xsl:template match="xhtml:*[xhtml:a[contains(@name, 'sdfootnote')]]" priority="1"/>
+
+  <xsl:template match="xhtml:sup[xhtml:a[contains(@name, 'sdfootnote')]]" mode="character-style-range">
+    <xsl:variable name="marker-name" select="xhtml:a[contains(@name, 'sdfootnote')]/@name"/>
+    <xsl:variable name="target" select="concat('#', $marker-name)"/>
+    <xsl:call-template name="process-footnote">
+      <xsl:with-param name="content">
+        <xsl:apply-templates select="//xhtml:*[xhtml:a[@href = $target]]" mode="character-style-range"/>
+      </xsl:with-param>  
+    </xsl:call-template>
+  </xsl:template>  
+    
   <!-- ==================================================================== -->
   <!-- Named templates -->
   <!-- ==================================================================== -->
@@ -419,12 +427,35 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <xsl:template name="char-style-range">
     <!-- The name of the character style in InDesign -->
     <xsl:param name="style-name"/> 
+    <xsl:param name="vertical-position" select="0"/> 
 
     <CharacterStyleRange>
       <xsl:attribute name="AppliedCharacterStyle">
         <xsl:value-of select="concat('CharacterStyle/', $style-name)"/>
       </xsl:attribute> 
+      <xsl:if test="$vertical-position != 0">
+        <xsl:attribute name="Position">
+          <xsl:value-of select="$vertical-position"/>
+        </xsl:attribute>
+      </xsl:if>
       <Content><xsl:value-of select="."/></Content>
     </CharacterStyleRange>  
   </xsl:template>
+
+  <xsl:template name="process-footnote">
+    <xsl:param name="content"/>
+    <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" 
+                         Position="Superscript">
+      <Footnote>
+        <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/$ID/NormalParagraphStyle">
+          <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+            <!-- InDesign magical footnote character -->
+            <Content><xsl:processing-instruction name="ACE">4</xsl:processing-instruction></Content>
+          </CharacterStyleRange>
+          <xsl:copy-of select="$content"/>
+        </ParagraphStyleRange>
+      </Footnote>
+    </CharacterStyleRange>  
+  </xsl:template>
+
 </xsl:stylesheet>
