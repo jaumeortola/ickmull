@@ -301,8 +301,10 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <xsl:template match="xhtml:a[not(@href)]" mode="hyperlink-url-destinations"/>
 
   <!-- ..but not footnotes -->
-  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote')]" mode="hyperlinks"/>
-  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote')]" mode="hyperlink-url-destinations"/>
+  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote') or
+                               contains(@name, 'sdendnote')]" mode="hyperlinks"/>
+  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote') or
+                               contains(@name, 'sdendnote')]" mode="hyperlink-url-destinations"/>
 
   <xsl:template match="xhtml:a[@href]" mode="hyperlink-url-destinations">
     <xsl:variable name="hyperlink-key" select="count(preceding::xhtml:a) + 1"/>
@@ -388,11 +390,15 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
 
        Additionally, we must ignore the footnoe content paragraphs where they
        actually appear in the document. -->
-  <xsl:template match="xhtml:*/xhtml:a[contains(@name, 'sdfootnote')]"  mode="character-style-range"/>
-  <xsl:template match="xhtml:*[xhtml:a[contains(@name, 'sdfootnote')]]" priority="1"/>
+  <xsl:template match="xhtml:*/xhtml:a[contains(@name, 'sdfootnote') or
+                                       contains(@name, 'sdendnote')]"  mode="character-style-range"/>
+  <xsl:template match="xhtml:*[xhtml:a[contains(@name, 'sdfootnote') or 
+                                       contains(@name, 'sdendnote')]]" priority="1"/>
 
-  <xsl:template match="xhtml:sup[xhtml:a[contains(@name, 'sdfootnote')]]" mode="character-style-range">
-    <xsl:variable name="marker-name" select="xhtml:a[contains(@name, 'sdfootnote')]/@name"/>
+  <xsl:template match="xhtml:sup[xhtml:a[contains(@name, 'sdfootnote') or
+                                         contains(@name, 'sdendnote')]]" mode="character-style-range">
+    <xsl:variable name="marker-name" select="xhtml:a[contains(@name, 'sdfootnote') or
+                                                     contains(@name, 'sdendnote')]/@name"/>
     <xsl:variable name="target" select="concat('#', $marker-name)"/>
     <xsl:call-template name="process-footnote">
       <xsl:with-param name="content">
