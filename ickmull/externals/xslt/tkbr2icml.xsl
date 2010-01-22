@@ -431,7 +431,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
                                [preceding-sibling::*[1]
                                                     [xhtml:a[@href = $target]]]">
           <!-- This is how we fake InDesign into separating "multi-paragraph"
-               footnotes (they're actually one paragraph -->
+               footnotes (they are actually one paragraph). -->
           <CharacterStyleRange>
             <Br/>
           </CharacterStyleRange>
@@ -454,6 +454,11 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <xsl:template match="xhtml:*[xhtml:a[contains(@href, '#_ftnref')]]" 
                 priority="1"/>
 
+  <!-- The second paragraphs of two-paragraph footnotes should be ignored as well. -->
+  <xsl:template match="xhtml:*[preceding-sibling::*[1]
+                                                   [xhtml:a[contains(@href, '#_ftnref')]]]" 
+                priority="1"/>
+
   <!-- The hardcoded anchors that used to link the footnotes together should
        also be omitted, as InDesign will generate auto-numbered foonote Markers. -->
   <xsl:template match="xhtml:*/xhtml:a[contains(@href, '#_ftnref')]"  
@@ -467,6 +472,21 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
       <xsl:with-param name="content">
         <xsl:apply-templates select="//xhtml:*[xhtml:a[@href = $target]]" 
                              mode="character-style-range"/>
+        <!-- Check if there are extra paragraphs hanging around after this one -->
+        <xsl:if test="//xhtml:*[not(xhtml:a[contains(@href, '#_ftnref')])]
+                               [preceding-sibling::*[1]
+                                                    [xhtml:a[@href = $target]]]">
+          <!-- This is how we fake InDesign into separating "multi-paragraph"
+               footnotes (they are actually one paragraph). -->
+          <CharacterStyleRange>
+            <Br/>
+          </CharacterStyleRange>
+          <xsl:apply-templates select="//xhtml:*[not(xhtml:a[contains(@href, '#_ftnref')])]
+                                                [preceding-sibling::*[1]
+                                                                     [xhtml:a[@href = $target]]]"
+                               mode="character-style-range"/>
+        </xsl:if>
+
       </xsl:with-param>  
     </xsl:call-template>
   </xsl:template>  
