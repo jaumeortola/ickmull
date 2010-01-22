@@ -406,6 +406,38 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
       </xsl:with-param>  
     </xsl:call-template>
   </xsl:template>  
+
+  <!-- Legacy docutils footnote support -->
+  <xsl:template match="xhtml:table[@class='docutils footnote']/xhtml:tbody/xhtml:tr">
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
+      <xsl:for-each select="xhtml:td">
+        <xsl:choose>
+          <xsl:when test="self::xhtml:td[@class='label']">
+            <CharacterStyleRange>
+              <Content><xsl:value-of select="substring-before(substring-after(.,'['),']')"/>. </Content>
+            </CharacterStyleRange>
+          </xsl:when>
+          <xsl:otherwise>
+            <Content>
+              <xsl:value-of select="."/>
+            </Content>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </ParagraphStyleRange>
+    <Br/>
+  </xsl:template>
+  <xsl:template match="xhtml:div[@class='footnotes']/xhtml:p">
+    <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
+      <CharacterStyleRange>
+        <Content>
+          <xsl:value-of select="."/>
+        </Content>
+        <Br/>
+      </CharacterStyleRange>
+    </ParagraphStyleRange>
+  </xsl:template>
+
     
   <!-- ==================================================================== -->
   <!-- Named templates -->
