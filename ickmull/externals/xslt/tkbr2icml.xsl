@@ -399,21 +399,50 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <!-- The paragraphs that contain the footnotes at the end of the document
        should be ignored in the default mode, as above. -->
   <xsl:template match="xhtml:*[xhtml:a[contains(@name, 'sdfootnote') or 
-                                       contains(@name, 'sdendnote')]]" priority="1"/>
+                                       contains(@name, 'sdendnote')]]" 
+                priority="1"/>
+
+  <!-- The second paragraphs of two-paragraph footnotes should be ignored as well. -->
+  <xsl:template match="xhtml:*[preceding-sibling::*[1]
+                                                   [xhtml:a[contains(@name, 'sdfootnote') or 
+                                                            contains(@name, 'sdendnote')]]]" 
+                priority="1"/>
 
   <!-- The hardcoded anchors that used to link the footnotes together should
        also be omitted, as InDesign will generate auto-numbered foonote Markers. -->
   <xsl:template match="xhtml:*/xhtml:a[contains(@name, 'sdfootnote') or
-                                       contains(@name, 'sdendnote')]"  mode="character-style-range"/>
+                                       contains(@name, 'sdendnote')]"  
+                mode="character-style-range"/>
 
   <xsl:template match="xhtml:sup[xhtml:a[contains(@name, 'sdfootnote') or
-                                         contains(@name, 'sdendnote')]]" mode="character-style-range">
+                                         contains(@name, 'sdendnote')]]" 
+                mode="character-style-range">
     <xsl:variable name="marker-name" select="xhtml:a[contains(@name, 'sdfootnote') or
                                                      contains(@name, 'sdendnote')]/@name"/>
     <xsl:variable name="target" select="concat('#', $marker-name)"/>
     <xsl:call-template name="process-footnote">
       <xsl:with-param name="content">
-        <xsl:apply-templates select="//xhtml:*[xhtml:a[@href = $target]]" mode="character-style-range"/>
+        <xsl:apply-templates select="//xhtml:*[xhtml:a[@href = $target]]" 
+                             mode="character-style-range"/>
+
+        <!-- Check if there are extra paragraphs hanging around after this one -->
+        <xsl:if test="//xhtml:*[not(xhtml:a[contains(@name, 'sdfootnote') or
+                                            contains(@name, 'sdendnote')])]
+                               [preceding-sibling::*[1]
+                                                    [xhtml:a[@href = $target]]]">
+          <!-- This is how we fake InDesign into separating "multi-paragraph"
+               footnotes (they're actually one paragraph -->
+          <CharacterStyleRange>
+            <Br/>
+          </CharacterStyleRange>
+          <!-- The content from the second paragraph itself is matched. Note
+               that any more than two paragraphs is unsupported. -->
+          <xsl:apply-templates select="//xhtml:*[not(xhtml:a[contains(@name, 'sdfootnote') or
+                                                             contains(@name, 'sdendnote')])]
+                                                [preceding-sibling::*[1]
+                                                                     [xhtml:a[@href = $target]]]"
+                               mode="character-style-range"/>
+        </xsl:if>                                                             
       </xsl:with-param>  
     </xsl:call-template>
   </xsl:template>  
@@ -422,18 +451,22 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <!-- == Word footnotes == -->
   <!-- The paragraphs that contain the footnotes at the end of the document
        should be ignored in the default mode, as above. -->
-  <xsl:template match="xhtml:*[xhtml:a[contains(@href, '#_ftnref')]]" priority="1"/>
+  <xsl:template match="xhtml:*[xhtml:a[contains(@href, '#_ftnref')]]" 
+                priority="1"/>
 
   <!-- The hardcoded anchors that used to link the footnotes together should
        also be omitted, as InDesign will generate auto-numbered foonote Markers. -->
-  <xsl:template match="xhtml:*/xhtml:a[contains(@href, '#_ftnref')]"  mode="character-style-range"/>
+  <xsl:template match="xhtml:*/xhtml:a[contains(@href, '#_ftnref')]"  
+                mode="character-style-range"/>
 
-  <xsl:template match="xhtml:a[contains(@name, '_ftnref')]" mode="character-style-range">
+  <xsl:template match="xhtml:a[contains(@name, '_ftnref')]" 
+                mode="character-style-range">
     <xsl:variable name="marker-name" select="@name"/>
     <xsl:variable name="target" select="concat('#', $marker-name)"/>
     <xsl:call-template name="process-footnote">
       <xsl:with-param name="content">
-        <xsl:apply-templates select="//xhtml:*[xhtml:a[@href = $target]]" mode="character-style-range"/>
+        <xsl:apply-templates select="//xhtml:*[xhtml:a[@href = $target]]" 
+                             mode="character-style-range"/>
       </xsl:with-param>  
     </xsl:call-template>
   </xsl:template>  
