@@ -382,18 +382,29 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   </xsl:template>  
 
 
-  <!-- Footnotes. 
+  <!-- ==================================================================== -->
+  <!-- Footnotes -->
+  <!-- ==================================================================== -->
 
-       Ignore the target anchors in the footnote "body" and insert the
+       
+  <!-- Ignore the target anchors in the footnote "body" and insert the
        footnote markup at the point in the text where the superscripted/boxed
        footnote anchor appears. 
 
        Additionally, we must ignore the footnoe content paragraphs where they
        actually appear in the document. -->
-  <xsl:template match="xhtml:*/xhtml:a[contains(@name, 'sdfootnote') or
-                                       contains(@name, 'sdendnote')]"  mode="character-style-range"/>
+
+  <!-- == OpenOffice.org footnotes == -->
+
+  <!-- The paragraphs that contain the footnotes at the end of the document
+       should be ignored in the default mode, as above. -->
   <xsl:template match="xhtml:*[xhtml:a[contains(@name, 'sdfootnote') or 
                                        contains(@name, 'sdendnote')]]" priority="1"/>
+
+  <!-- The hardcoded anchors that used to link the footnotes together should
+       also be omitted, as InDesign will generate auto-numbered foonote Markers. -->
+  <xsl:template match="xhtml:*/xhtml:a[contains(@name, 'sdfootnote') or
+                                       contains(@name, 'sdendnote')]"  mode="character-style-range"/>
 
   <xsl:template match="xhtml:sup[xhtml:a[contains(@name, 'sdfootnote') or
                                          contains(@name, 'sdendnote')]]" mode="character-style-range">
@@ -407,7 +418,27 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     </xsl:call-template>
   </xsl:template>  
 
-  <!-- Legacy docutils footnote support -->
+
+  <!-- == Word footnotes == -->
+  <!-- The paragraphs that contain the footnotes at the end of the document
+       should be ignored in the default mode, as above. -->
+  <xsl:template match="xhtml:*[xhtml:a[contains(@href, '#_ftnref')]]" priority="1"/>
+
+  <!-- The hardcoded anchors that used to link the footnotes together should
+       also be omitted, as InDesign will generate auto-numbered foonote Markers. -->
+  <xsl:template match="xhtml:*/xhtml:a[contains(@href, '#_ftnref')]"  mode="character-style-range"/>
+
+  <xsl:template match="xhtml:a[contains(@name, '_ftnref')]" mode="character-style-range">
+    <xsl:variable name="marker-name" select="@name"/>
+    <xsl:variable name="target" select="concat('#', $marker-name)"/>
+    <xsl:call-template name="process-footnote">
+      <xsl:with-param name="content">
+        <xsl:apply-templates select="//xhtml:*[xhtml:a[@href = $target]]" mode="character-style-range"/>
+      </xsl:with-param>  
+    </xsl:call-template>
+  </xsl:template>  
+
+  <!-- == Docutils footnotes (legacy) == -->
   <xsl:template match="xhtml:table[@class='docutils footnote']/xhtml:tbody/xhtml:tr">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/footnote">
       <xsl:for-each select="xhtml:td">
