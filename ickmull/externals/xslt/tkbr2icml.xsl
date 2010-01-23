@@ -115,14 +115,7 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     </xsl:call-template>
   </xsl:template>
 
-  <!-- TODO: Why not just always use the @class for the style-name?-->
-  <xsl:template match="xhtml:p[@class='excerpt' or
-                               @class='figure_table' or
-                               @class='index' or
-                               @class='index_sub' or
-                               @class='quote' or
-                               @class='quote_ind' or
-                               @class='reference']">
+  <xsl:template match="xhtml:p[@class and not(starts-with(@class, 'dc-'))]">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name" select="@class"/>
     </xsl:call-template>
