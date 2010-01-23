@@ -403,10 +403,38 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
                 priority="1"/>
 
   <!-- The second paragraphs of two-paragraph footnotes should be ignored as well. -->
-  <xsl:template match="xhtml:*[preceding-sibling::*[1]
+  <xsl:template match="xhtml:*[not(xhtml:a[contains(@name, 'sdfootnote') or 
+                                            contains(@name, 'sdendnote')])]
+                              [preceding-sibling::*[1]
                                                    [xhtml:a[contains(@name, 'sdfootnote') or 
                                                             contains(@name, 'sdendnote')]]]" 
                 priority="1"/>
+
+  <!-- The third paragraphs of multi-paragraph footnotes should generate a
+       warning. This XPath is horrific, sorry. 
+
+       Find <p>s that do not have a footnote marker and whose immediate
+       predecessors also do not have a footnote marker but that are immediately 
+       preceded by an element that DOES have a footnote marker. This will 
+       always match the third <p> that follows a "normal" start of footnote 
+       paragraph. -->
+  <xsl:template match="xhtml:p[not(xhtml:a[contains(@name, 'sdfootnote') or 
+                                           contains(@name, 'sdendnote')])]
+                              [preceding-sibling::*[1]
+                                                   [not(xhtml:a[contains(@name, 'sdfootnote') or 
+                                                                contains(@name, 'sdendnote')])]]
+                              [preceding-sibling::*[2]
+                                                   [xhtml:a[contains(@name, 'sdfootnote') or 
+                                                            contains(@name, 'sdendnote')]]]"
+                priority="1">
+  <xsl:message>WARNING: Footnotes with more than 2 paragraphs are not supported. Extra paragraphs will appear at the end of the document!
+Problematic text starts with: <xsl:value-of select="."/> 
+</xsl:message>
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">p</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>              
+
 
   <!-- The hardcoded anchors that used to link the footnotes together should
        also be omitted, as InDesign will generate auto-numbered foonote Markers. -->
@@ -455,13 +483,30 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
                 priority="1"/>
 
   <!-- The second paragraphs of two-paragraph footnotes should be ignored as well. -->
-  <xsl:template match="xhtml:*[preceding-sibling::*[1]
+  <xsl:template match="xhtml:*[not(xhtml:a[contains(@href, '#_ftnref')])]
+                              [preceding-sibling::*[1]
                                                    [xhtml:a[contains(@href, '#_ftnref')]]]" 
                 priority="1"/>
 
+  <!-- The third paragraphs of multi-paragraph footnotes should warn. See
+       above for explanation of this horrific XPath. -->
+  <xsl:template match="xhtml:p[not(xhtml:a[contains(@href, '#_ftnref')])]
+                              [preceding-sibling::*[1]
+                                                   [not(xhtml:a[contains(@href, '#_ftnref')])]]
+                              [preceding-sibling::*[2]
+                                                   [xhtml:a[contains(@href, '#_ftnref')]]]"
+                priority="1">
+  <xsl:message>WARNING: Footnotes with more than 2 paragraphs are not supported. Extra paragraphs will appear at the end of the document!
+Problematic text starts with: <xsl:value-of select="."/> 
+</xsl:message>
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">p</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>              
+
   <!-- The hardcoded anchors that used to link the footnotes together should
        also be omitted, as InDesign will generate auto-numbered foonote Markers. -->
-  <xsl:template match="xhtml:*/xhtml:a[contains(@href, '#_ftnref')]"  
+  <xsl:template match="xhtml:*/xhtml:a[contains(@href, '#_ftnref')]"
                 mode="character-style-range"/>
 
   <xsl:template match="xhtml:a[contains(@name, '_ftnref')]" 

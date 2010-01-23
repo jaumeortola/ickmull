@@ -20,6 +20,9 @@ def as_icml(xhtml):
        result as another etree document, ready for serialization.""" 
     icml_transformer = etree.XSLT(etree.parse(XHTML_TO_ICML))
     icml = icml_transformer(xhtml)
+    errors = icml_transformer.error_log
+    if str(errors).strip() != '':
+        log.warn(errors)
     return icml
 
 

@@ -7,6 +7,9 @@ Created by Keith Fahlgren on Mon Dec 21 15:08:24 PST 2009
 Copyright (c) 2009 John W Maxwell. All rights reserved.
 """
 
+import StringIO
+
+
 import difflib
 import glob
 import logging
@@ -38,6 +41,21 @@ class TestXHTML(object):
         icml = ickmull.xhtml.as_icml(self.test_xhtml)
         assert(ickmull.icml.validate(icml))
 
+    def test_xhtml_three_footnote_warning(self):
+        """An XHTML document with many-paragraph footnotes should not be able to be transformed into an ICML document without warning the user."""
+        three_para_footnote_xhtml_fn = os.path.join(self.testfiles_dir, 'smoketests', 'ThreeParagraphFootnoteTest.html')
+        three_para_footnote_xhtml = etree.parse(three_para_footnote_xhtml_fn)
+        warning_log_output = StringIO.StringIO()
+        warning_log = logging.getLogger('ickmull.xhtml')
+        warning_log_handler = logging.StreamHandler(warning_log_output)
+        warning_log_handler.setLevel(logging.DEBUG)
+        warning_log_handler.setFormatter(logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s'))
+        warning_log.addHandler(warning_log_handler)
+        icml = ickmull.xhtml.as_icml(three_para_footnote_xhtml)
+        warning_log_handler.flush()
+        output = warning_log_output.getvalue()
+        assert('more than 2' in output)
+
     def test_xhtml_icml_output_same_smoke(self):
         """All XHTML documents collected for smoketesting should be able to be transformed into an ICML document that matches the saved version."""
         smoketests_dir = os.path.join(self.testfiles_dir, 'smoketests')
@@ -46,7 +64,6 @@ class TestXHTML(object):
             expected_icml_fn = os.path.join(smoketests_dir, xhtml_docname + '.icml')
             expected_icml = etree.parse(expected_icml_fn)
 
-            log.debug('\nSmoke testing ICML similarity of %s' % xhtml_docname)
             xhtml = etree.parse(xhtml_fn)
             icml = ickmull.xhtml.as_icml(xhtml)
             try:
