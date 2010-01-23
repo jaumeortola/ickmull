@@ -68,17 +68,17 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
         <ParagraphStyle Self="ParagraphStyle/h2" Name="h2"/>
         <ParagraphStyle Self="ParagraphStyle/h3" Name="h3"/>
         <ParagraphStyle Self="ParagraphStyle/h4" Name="h4"/>
+        <ParagraphStyle Self="ParagraphStyle/h5" Name="h5"/>
+        <ParagraphStyle Self="ParagraphStyle/h6" Name="h6"/>
         <ParagraphStyle Self="ParagraphStyle/pInitial" Name="pInitial"/>
         <ParagraphStyle Self="ParagraphStyle/p" Name="p"/>
         <ParagraphStyle Self="ParagraphStyle/ul" Name="ul"/>
         <ParagraphStyle Self="ParagraphStyle/ol" Name="ol"/>
         <ParagraphStyle Self="ParagraphStyle/table" Name="table"/>
-        <ParagraphStyle Self="ParagraphStyle/figure_table" Name="figure_table"/>
         <ParagraphStyle Self="ParagraphStyle/quote" Name="quote"/>
-        <ParagraphStyle Self="ParagraphStyle/reference" Name="reference"/>
-        <ParagraphStyle Self="ParagraphStyle/excerpt" Name="excerpt"/>
-        <ParagraphStyle Self="ParagraphStyle/author" Name="author"/>
         <ParagraphStyle Self="ParagraphStyle/footnote" Name="footnote"/>
+        <!-- Generate the rest of the ParagraphStyles using the @class value -->
+        <xsl:apply-templates select="//xhtml:p[@class]" mode='paragraph-style'/>
       </RootParagraphStyleGroup>
       <Story Self="xhtml2icml_default_story" AppliedTOCStyle="n" TrackChanges="false" StoryTitle="MyStory" AppliedNamedGrid="n">
         <StoryPreference OpticalMarginAlignment="false" OpticalMarginSize="12" FrameType="TextFrameType" StoryOrientation="Horizontal" StoryDirection="LeftToRightDirection"/>
@@ -581,6 +581,36 @@ Problematic text starts with: <xsl:value-of select="."/>
 
     
   <!-- ==================================================================== -->
+  <!-- StyleGroup boilerplate -->
+  <!-- ==================================================================== -->
+
+  <xsl:template match="xhtml:p[@class]" mode="paragraph-style"/>
+
+  <!-- Grab only the first instance of each class -->
+  <xsl:template match="xhtml:p[@class]"
+                mode="paragraph-style">
+    <xsl:variable name="c" select="@class"/>
+    <xsl:if test="not(following::xhtml:p[@class = $c])">
+      <xsl:choose>
+        <xsl:when test="@class='quote'">
+          <!-- Ignore; already hardcoded because of <blockquote> -->
+        </xsl:when>
+        <xsl:when test="@class='dc-creator'">
+          <xsl:call-template name="generate-paragraph-style">
+            <xsl:with-param name="style-name">author</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="generate-paragraph-style">
+            <xsl:with-param name="style-name" select="@class"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>    
+
+
+  <!-- ==================================================================== -->
   <!-- Named templates -->
   <!-- ==================================================================== -->
   <xsl:template name="para-style-range">
@@ -635,6 +665,14 @@ Problematic text starts with: <xsl:value-of select="."/>
         </ParagraphStyleRange>
       </Footnote>
     </CharacterStyleRange>  
+  </xsl:template>
+
+  <xsl:template name="generate-paragraph-style">
+    <xsl:param name="style-name"/>
+    <ParagraphStyle>
+      <xsl:attribute name="Self"><xsl:value-of select="concat('ParagraphStyle/', $style-name)"/></xsl:attribute> 
+      <xsl:attribute name="Name"><xsl:value-of select="$style-name"/></xsl:attribute>
+    </ParagraphStyle>
   </xsl:template>
 
 </xsl:stylesheet>
