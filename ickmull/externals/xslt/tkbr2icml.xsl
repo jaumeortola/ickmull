@@ -68,8 +68,8 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
         <ParagraphStyle Self="ParagraphStyle/h4" Name="h4"/>
         <ParagraphStyle Self="ParagraphStyle/h5" Name="h5"/>
         <ParagraphStyle Self="ParagraphStyle/h6" Name="h6"/>
-        <ParagraphStyle Self="ParagraphStyle/pInitial" Name="pInitial"/>
         <ParagraphStyle Self="ParagraphStyle/p" Name="p"/>
+        <ParagraphStyle Self="ParagraphStyle/pFollowsP" Name="pFollowsP"/>
         <ParagraphStyle Self="ParagraphStyle/ul" Name="ul"/>
         <ParagraphStyle Self="ParagraphStyle/ol" Name="ol"/>
         <ParagraphStyle Self="ParagraphStyle/table" Name="table"/>
@@ -105,34 +105,32 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <!-- Paras and block-level elements -->
   <!-- ==================================================================== -->
 
-  <!-- Normal paragraphs with either a InDesign named based on @class (or
-       default of 'p'). -->
+  <!-- == Initial-vs-subsequent paragraph treatment == 
+       The more I think about it (and muse on Bringhurst's elegant simplicity), 
+       the more I think that the right way to treat this is to say that the 
+       default paragraph treatment should use the 'p' style and the 
+       *special case* is a "normal" (@class-less) paragraph that immediately 
+       follows another normabl paragraph. Use the 'pFollowsP' for that case. -->
+
+  <!-- Normal initial paragraphs -->
   <xsl:template match="xhtml:p[not(@class)]">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">p</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="xhtml:p[@class and not(starts-with(@class, 'dc-'))]">
+  <!-- Paragraphs that follow paragraphs -->
+  <xsl:template match="xhtml:p[not(@class)]
+                              [preceding-sibling::*[1][self::xhtml:p[not(@class)]]]">
     <xsl:call-template name="para-style-range">
-      <xsl:with-param name="style-name" select="@class"/>
+      <xsl:with-param name="style-name">pFollowsP</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
-  <!-- An unadorned (no @class attribute) p element that *directly*
-       follows any first- through third-level heading (h1-h3) should
-       be given a paragraph style 'pInitial' in InDesign. -->
-  <xsl:template match="xhtml:p[not(@class)]
-                              [preceding-sibling[1]
-                                                   [self::xhtml:h1|
-                                                    self::xhtml:h2|
-                                                    self::xhtml:h3|
-                                                    self::xhtml:h4|
-                                                    self::xhtml:h5|
-                                                    self::xhtml:h6|
-                                                    self::xhtml:blockquote]]">
+  <!-- Dynamically-style-named paragraphs -->
+  <xsl:template match="xhtml:p[@class and not(starts-with(@class, 'dc-'))]">
     <xsl:call-template name="para-style-range">
-      <xsl:with-param name="style-name">pInitial</xsl:with-param>
+      <xsl:with-param name="style-name" select="@class"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -143,7 +141,6 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
       <xsl:with-param name="prefix-content">by </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
-
 
   <!-- Quotes (also available from <p class="quote">) -->
   <xsl:template match="xhtml:blockquote/xhtml:p">
