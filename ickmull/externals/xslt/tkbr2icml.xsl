@@ -47,6 +47,9 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     <xsl:apply-templates select="@*|node()"/>
   </xsl:template>
 
+  <!-- ==================================================================== -->
+  <!-- Document root generation and boilerplate. -->
+  <!-- ==================================================================== -->
   <xsl:template match="xhtml:body">
     <xsl:processing-instruction name="aid"><xsl:value-of select="$icml-decl-pi"/></xsl:processing-instruction>
     <xsl:processing-instruction name="aid"><xsl:value-of select="$snippet-type-pi"/></xsl:processing-instruction>
@@ -100,15 +103,12 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   </xsl:template>
 
 
-  <!-- Document metadata -->
-  <xsl:template match="xhtml:p[@class='dc-creator']">
-    <xsl:call-template name="para-style-range">
-      <xsl:with-param name="style-name">author</xsl:with-param>
-      <xsl:with-param name="prefix-content">by </xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
+  <!-- ==================================================================== -->
   <!-- Paras and block-level elements -->
+  <!-- ==================================================================== -->
+
+  <!-- Normal paragraphs with either a InDesign named based on @class (or
+       default of 'p'). -->
   <xsl:template match="xhtml:p[not(@class)]">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">p</xsl:with-param>
@@ -138,13 +138,25 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     </xsl:call-template>
   </xsl:template>
 
+  <!-- Document metadata paragraphs have a @clas starting with 'dc-' -->
+  <xsl:template match="xhtml:p[@class='dc-creator']">
+    <xsl:call-template name="para-style-range">
+      <xsl:with-param name="style-name">author</xsl:with-param>
+      <xsl:with-param name="prefix-content">by </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+
+  <!-- Quotes (also available from <p class="quote">) -->
   <xsl:template match="xhtml:blockquote/xhtml:p">
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">quote</xsl:with-param>
     </xsl:call-template>
   </xsl:template>    
 
+  <!-- ==================================================================== -->
   <!-- Lists -->
+  <!-- ==================================================================== -->
   <!-- TODO: What about other children of the li? What about multiple children
        on a single li? -->
   <xsl:template match="xhtml:ol/xhtml:li[*]|
@@ -173,7 +185,14 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   </xsl:template>
 
 
+  <!-- ==================================================================== -->
   <!-- Tables -->
+  <!-- ==================================================================== -->
+
+  <!-- TODO: 
+         Allow for tables with less than 3 rows
+         Make code more idiomatic XSLT (even if functionality isn't increased)
+         -->
   <xsl:template match="xhtml:table[@class='docutils']/xhtml:tbody">
     <ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/table">
       <CharacterStyleRange>
@@ -236,7 +255,9 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     </xsl:if>
   </xsl:template>
 
+  <!-- ==================================================================== -->
   <!-- Images -->
+  <!-- ==================================================================== -->
   <xsl:template match="xhtml:img">
     <xsl:variable name="halfwidth" select="@width div 2"/>
     <xsl:variable name="halfheight" select="@height div 2"/>
@@ -276,7 +297,9 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     </ParagraphStyleRange>
   </xsl:template>
 
+  <!-- ==================================================================== -->
   <!-- Links -->
+  <!-- ==================================================================== -->
   <xsl:template match="xhtml:a" mode="character-style-range">
     <xsl:variable name="hyperlink-key" select="count(preceding::xhtml:a) + 1"/>
     <xsl:variable name="self" select="concat('htss-', $hyperlink-key)"/>
@@ -289,15 +312,9 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     </CharacterStyleRange>
   </xsl:template>  
 
-  <!-- TODO: Support for internal hyperlinks -->
+  <!-- TODO: Add support for internal hyperlinks -->
   <xsl:template match="xhtml:a[not(@href)]" mode="hyperlinks"/>
   <xsl:template match="xhtml:a[not(@href)]" mode="hyperlink-url-destinations"/>
-
-  <!-- ..but not footnotes -->
-  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote') or
-                               contains(@name, 'sdendnote')]" mode="hyperlinks"/>
-  <xsl:template match="xhtml:a[contains(@name, 'sdfootnote') or
-                               contains(@name, 'sdendnote')]" mode="hyperlink-url-destinations"/>
 
   <xsl:template match="xhtml:a[@href]" mode="hyperlink-url-destinations">
     <xsl:variable name="hyperlink-key" select="count(preceding::xhtml:a) + 1"/>
@@ -331,7 +348,9 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   </xsl:template>  
 
 
+  <!-- ==================================================================== -->
   <!-- Inlines -->
+  <!-- ==================================================================== -->
   <xsl:template match="xhtml:em|xhtml:i" mode="character-style-range">
     <xsl:call-template name="char-style-range">
       <xsl:with-param name="style-name">i</xsl:with-param>
