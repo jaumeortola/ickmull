@@ -55,13 +55,11 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
     <xsl:processing-instruction name="aid"><xsl:value-of select="$snippet-type-pi"/></xsl:processing-instruction>
     <Document DOMVersion="6.0" Self="xhtml2icml_document">
       <RootCharacterStyleGroup Self="xhtml2icml_character_styles">
-        <CharacterStyle Self="CharacterStyle/table_figure" Name="table_figure"/>
-        <CharacterStyle Self="CharacterStyle/fnref" Name="fnref"/>
         <CharacterStyle Self="CharacterStyle/link" Name="link"/>
         <CharacterStyle Self="CharacterStyle/i" Name="i"/>
-        <CharacterStyle Self="CharacterStyle/italic_sc" Name="italic_sc"/>
-        <CharacterStyle Self="CharacterStyle/sc" Name="sc"/>
         <CharacterStyle Self="CharacterStyle/b" Name="b"/>
+        <!-- Generate the rest of the CharacterStyles using the @class value -->
+        <xsl:apply-templates select="//xhtml:span[@class]" mode='character-style'/>
       </RootCharacterStyleGroup>
       <RootParagraphStyleGroup Self="xhtml2icml_paragraph_styles">
         <ParagraphStyle Self="ParagraphStyle/h1" Name="h1"/>
@@ -584,9 +582,7 @@ Problematic text starts with: <xsl:value-of select="."/>
   <!-- StyleGroup boilerplate -->
   <!-- ==================================================================== -->
 
-  <xsl:template match="xhtml:p[@class]" mode="paragraph-style"/>
-
-  <!-- Grab only the first instance of each class -->
+  <!-- Grab only the first instance of each @class -->
   <xsl:template match="xhtml:p[@class]"
                 mode="paragraph-style">
     <xsl:variable name="c" select="@class"/>
@@ -606,6 +602,16 @@ Problematic text starts with: <xsl:value-of select="."/>
           </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
+    </xsl:if>
+  </xsl:template>    
+
+  <xsl:template match="xhtml:span[@class]"
+                mode="character-style">
+    <xsl:variable name="c" select="@class"/>
+    <xsl:if test="not(following::xhtml:span[@class = $c])">
+      <xsl:call-template name="generate-character-style">
+        <xsl:with-param name="style-name" select="@class"/>
+      </xsl:call-template>
     </xsl:if>
   </xsl:template>    
 
@@ -673,6 +679,14 @@ Problematic text starts with: <xsl:value-of select="."/>
       <xsl:attribute name="Self"><xsl:value-of select="concat('ParagraphStyle/', $style-name)"/></xsl:attribute> 
       <xsl:attribute name="Name"><xsl:value-of select="$style-name"/></xsl:attribute>
     </ParagraphStyle>
+  </xsl:template>
+
+  <xsl:template name="generate-character-style">
+    <xsl:param name="style-name"/>
+    <CharacterStyle>
+      <xsl:attribute name="Self"><xsl:value-of select="concat('CharacterStyle/', $style-name)"/></xsl:attribute> 
+      <xsl:attribute name="Name"><xsl:value-of select="$style-name"/></xsl:attribute>
+    </CharacterStyle>
   </xsl:template>
 
 </xsl:stylesheet>
