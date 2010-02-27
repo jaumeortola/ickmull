@@ -152,28 +152,49 @@ v0.4 - Keith Fahlgren: Refactored XSLT for clarity, organization, and extensibil
   <!-- ==================================================================== -->
   <!-- Lists -->
   <!-- ==================================================================== -->
-  <!-- TODO: What about other children of the li? What about multiple children
-       on a single li? -->
-  <xsl:template match="xhtml:ol/xhtml:li[*]|
-                       xhtml:ul/xhtml:li[*]">
-    <xsl:if test="count(*) &gt; 1">
-      <xsl:message terminate="yes">Multi-element list items not handled!
-</xsl:message>
-    </xsl:if>
-    <xsl:if test="*[not(self::xhtml:p)]">
-      <xsl:message terminate="yes">Non-paragraph list children not handled!
-</xsl:message>
-    </xsl:if>
-    <xsl:apply-templates/>
-  </xsl:template>
   <xsl:template match="xhtml:ol/xhtml:li/xhtml:p|
-                       xhtml:ol/xhtml:li[not(*)]">
+                       xhtml:ol/xhtml:li[not(xhtml:p)]">
+    <!-- Block-level children other than 'p' are not tested ... -->
+    <xsl:if test="count(../xhtml:p) &gt; 1">
+      <xsl:message terminate="yes">&lt;li&gt;s are not allowed to contain more
+      than one &lt;p&gt;!
+</xsl:message>
+    </xsl:if>
+    <xsl:if test="*[not(self::xhtml:a or
+                        self::xhtml:em or
+                        self::xhtml:i or
+                        self::xhtml:strong or
+                        self::xhtml:b or 
+                        self::xhtml:span or
+                        self::xhtml:sup or
+                        self::xhtml:sub)]">
+      <xsl:message terminate="yes">Only paragraphs and some inline elements are allowed inside &lt;li&gt;!
+</xsl:message>
+    </xsl:if>
+
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">ol</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
   <xsl:template match="xhtml:ul/xhtml:li/xhtml:p|
-                       xhtml:ul/xhtml:li[not(*)]">
+                       xhtml:ul/xhtml:li[not(xhtml:p)]">
+    <!-- Block-level children other than 'p' are not tested ... -->
+    <xsl:if test="count(../xhtml:p) &gt; 1">
+      <xsl:message terminate="yes">&lt;li&gt;s are not allowed to contain more
+      than one &lt;p&gt;!
+</xsl:message>
+    </xsl:if>
+    <xsl:if test="*[not(self::xhtml:a or
+                        self::xhtml:em or
+                        self::xhtml:i or
+                        self::xhtml:strong or
+                        self::xhtml:b or 
+                        self::xhtml:span or
+                        self::xhtml:sup or
+                        self::xhtml:sub)]">
+      <xsl:message terminate="yes">Only paragraphs and some inline elements are allowed inside &lt;li&gt;!
+</xsl:message>
+    </xsl:if>
     <xsl:call-template name="para-style-range">
       <xsl:with-param name="style-name">ul</xsl:with-param>
     </xsl:call-template>
