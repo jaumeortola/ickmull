@@ -1,0 +1,5 @@
+#xsltproc is a nearly ubiquitous xslt tool
+
+xsltproc is probably already installed on your Mac or Linux machine. It's part of the ubiquitous libxml toolkit, which is nearly everywhere, except on Windows. For Windows users, here is an [exaustive/exhausting guide to installing libxml and libxslt](http://www.zlatkovic.com/libxml.en.html) (and, by extension, xsltproc). You can probably use another XSLT processor if you don't have xsltproc.
+
+Mac users who haven't done this before... just open up Terminal.app, `cd` into a folder containing your files (might be helpful to have the `.xsl` script and the `.html` input in the same place). Then just run it. It shouldn't require any more setup than that. Note that you can drag files from the Finder.app into Terminal.app and it'll copy the filename paths for you.
